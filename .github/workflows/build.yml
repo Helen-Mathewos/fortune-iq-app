@@ -7,24 +7,29 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Step 1: Checkout your repo
+      - uses: actions/checkout@v4
 
+      # Step 2: Install system dependencies
       - name: Install system dependencies
         run: |
           sudo apt-get update -y
           sudo apt-get install -y \
-          python3-pip git zip unzip \
-          openjdk-17-jdk \
-          autoconf automake libtool pkg-config \
-          libffi-dev libssl-dev \
-          libncurses5
+            python3-pip \
+            git zip unzip \
+            openjdk-17-jdk \
+            autoconf automake libtool pkg-config \
+            libffi-dev \
+            libssl-dev \
+            libncurses5
 
+      # Step 3: Install Python dependencies
       - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
           pip install buildozer cython
 
+      # Step 4: Install Android SDK and Build Tools
       - name: Install Android SDK and Build Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
@@ -35,13 +40,17 @@ jobs:
           mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
-          sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653"
+          sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653" "cmdline-tools;latest"
+          yes | sdkmanager --licenses
 
+      # Step 5: Build the APK
       - name: Build APK
         run: |
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/33.0.2:$PATH
           buildozer android debug
 
+      # Step 6: Upload APK as artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
