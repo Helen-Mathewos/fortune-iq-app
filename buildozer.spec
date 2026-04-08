@@ -24,6 +24,9 @@ orientation = portrait
 # (str) App version
 version = 1.0
 
+# Path to your Android SDK
+android.sdk_path = /usr/local/android-sdk
+
 [buildozer]
 
 # (int) Log level (0 = error only, 2 = debug)
