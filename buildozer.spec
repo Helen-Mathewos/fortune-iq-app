@@ -21,6 +21,8 @@ requirements = python3,kivy
 # (str) Application orientation
 orientation = portrait
 
+# (str) App version
+version = 1.0
 
 [buildozer]
 
